@@ -1,39 +1,54 @@
-# THE ATTIC · v1.0
+# The Attic · v2
 
-Una pequeña PWA **para móvil, en vertical**, con habitaciones originales de pixel art, mascotas, una ventana interactiva y una colección personal de películas, series, libros, videojuegos, cómics, manga, hobbies, música y recuerdos.
+PWA en formato vertical para iPhone / móvil, lista para GitHub Pages.
 
-## Publicar gratis en GitHub Pages
+## Novedades principales de esta versión
 
-1. Crea un repositorio nuevo en GitHub, por ejemplo `the-attic`.
-2. Sube **el contenido de esta carpeta** a la raíz del repositorio. Deben quedar `index.html`, `app.js`, `pixel-world.js`, `styles.css`, `manifest.webmanifest`, `sw.js` y la carpeta `assets` en la raíz.
-3. En GitHub entra en **Settings → Pages**. En *Build and deployment*, elige **Deploy from a branch**, selecciona la rama `main` y `/ (root)` y guarda.
-4. Cuando GitHub Pages termine de publicar, abre la URL indicada en Settings → Pages. Normalmente será `https://TU-USUARIO.github.io/the-attic/`.
-5. En el iPhone, abre esa web desde **Safari → Compartir → Añadir a pantalla de inicio**.
+- **Ático mucho más amplio** y tratado como un pequeño universo.
+- **Cada tipo de tesoro tiene su propio rincón**: películas, series, libros, videojuegos, cómics, manga, hobbies y recuerdos.
+- **Diario independiente** con entradas, fecha, estado de ánimo y favoritos.
+- **Estéticas diferenciadas**:
+  - Ático melancólico en Manhattan
+  - Ático folk en Kyoto
+  - Iglú con pingüino
+  - Cabaña entre pinos
+  - Observatorio nocturno
+- **Ventana temática** con paisaje acorde al mundo elegido.
+- **Exportar / importar copia** en JSON.
+- **PWA offline** con service worker.
 
-No hace falta `npm`, Node, Firebase, API ni cuenta para usar The Attic.
+## Instalación en GitHub Pages
 
-## Funciones
+1. Sube **todos los archivos** de esta carpeta a la raíz de un repositorio.
+2. Ve a **Settings → Pages**.
+3. En **Build and deployment**, selecciona:
+   - **Source:** Deploy from a branch
+   - **Branch:** `main`
+   - **Folder:** `/ (root)`
+4. Guarda y espera a que GitHub publique la web.
+5. Abre la URL desde Safari en iPhone y usa **Compartir → Añadir a pantalla de inicio**.
 
-- 5 ambientes: Manhattan, Kyoto, iglú, cabaña y observatorio.
-- 6 mascotas: gato, perro, pingüino, zorro, conejo o cuervo. Puedes ponerles nombre.
-- Habitación pixelada con objetos interactivos y acceso a rincones.
-- Paisajes pixel art de día, al atardecer y de noche, con ambiente animado opcional. Se pueden guardar como postal PNG.
-- Biblioteca con 9 tipos de tesoros: título, valoración 0–5 estrellas, opinión, favorito, estado, fecha, detalle, foto/portada, búsqueda, filtros y ordenación.
-- Guardado local automático (IndexedDB; fallback de `localStorage`).
-- Exportación e importación de copia `.json` con imágenes incluidas.
-- Soporte offline tras abrirla desde una dirección HTTPS al menos una vez.
-- Adaptada a la pantalla del iPhone; en ordenador aparece como una aplicación estrecha centrada.
+## Estructura de archivos
 
-## Privacidad y límites
+- `index.html` → shell de la app
+- `styles.css` → estilos móviles
+- `app.js` → lógica de la PWA
+- `pixel-world.js` → escenas y pixel art por temas / rincones
+- `manifest.webmanifest` → configuración PWA
+- `sw.js` → cache offline
+- `assets/` → iconos
 
-**Tus datos permanecen en el navegador del dispositivo.** No hay servidor ni sincronización entre móviles. Eliminar datos de Safari, usar navegación privada o borrar la web app puede hacer que desaparezcan. **Descarga periódicamente una copia de seguridad** en `Mi mundo` y guárdala en Archivos/iCloud Drive si quieres conservarla.
+## Importante
 
-Las fotos se comprimen para reducir el espacio ocupado. Si el dispositivo está lleno o el navegador rechaza el guardado, se muestra un aviso.
+- Los datos se guardan **en el navegador/dispositivo**.
+- Si cambias de móvil o borras los datos del navegador, podrías perderlos si no exportas copia.
+- Las imágenes de portada se reducen automáticamente para ocupar menos.
 
-Para actualizar tras publicar una nueva versión, cambia `CACHE` dentro de `sw.js`; el navegador podrá recibir la nueva versión al abrir la app con conexión.
+## Ideas para una v3
 
-## Desarrollar
-
-Puedes editar todos los archivos directamente. La ilustración pixel art se genera en `pixel-world.js`, sin usar imágenes, recursos comerciales ni librerías externas. El código de la aplicación está en `app.js`. Los iconos están preparados en la carpeta `assets`.
-
-Licencia: uso y adaptación permitidos por la persona que reciba este proyecto. Los dibujos son originales y no dependen de marcas de terceros.
+- Decoración desbloqueable por categorías.
+- Más habitaciones / temas.
+- Más mascotas y animaciones.
+- Filtros avanzados y etiquetas.
+- “Objeto físico” en la habitación para favoritos.
+- Música ambiente opcional.

@@ -1,249 +1,435 @@
-/* The Attic — original pixel illustrations drawn locally, no external images or libraries. */
 (() => {
 'use strict';
+
 const THEMES = {
-  manhattan:{name:'Manhattan, 1994',place:'Lluvia sobre los tejados',wall:'#38435b',wallLight:'#47516b',floor:'#644b52',floorLine:'#9a6b62',wood:'#9a6d63',woodDark:'#503944',frame:'#b28e7c',light:'#ffd69c',rug:'#9a686d',rug2:'#c68c81',out:'#1b2639'},
-  kyoto:{name:'Kyoto de primavera',place:'Cerezos en flor',wall:'#607b72',wallLight:'#73918a',floor:'#a59572',floorLine:'#dbc7a0',wood:'#8c6650',woodDark:'#57483e',frame:'#d6b896',light:'#ffeab4',rug:'#a88485',rug2:'#dfb1a3',out:'#243a38'},
-  igloo:{name:'Iglú bajo la aurora',place:'El cielo del norte',wall:'#7199ad',wallLight:'#8bb6c7',floor:'#96bfd0',floorLine:'#d6f4f6',wood:'#7795a8',woodDark:'#355b75',frame:'#def5f2',light:'#f8e5ad',rug:'#637d9d',rug2:'#a9d0e1',out:'#1e4359'},
-  forest:{name:'Cabaña entre pinos',place:'Donde empieza el bosque',wall:'#685747',wallLight:'#7c6850',floor:'#79583c',floorLine:'#b58d5a',wood:'#aa8458',woodDark:'#40382e',frame:'#dfbc83',light:'#ffdfa1',rug:'#748369',rug2:'#afba83',out:'#282c27'},
-  observatory:{name:'Observatorio nocturno',place:'Un millón de estrellas',wall:'#3c375b',wallLight:'#534968',floor:'#5b4c70',floorLine:'#8b709b',wood:'#8d7798',woodDark:'#342a4c',frame:'#c5a3c5',light:'#fff0c4',rug:'#6876a4',rug2:'#b09ac3',out:'#201d36'}
+  manhattan: {
+    name: 'Ático melancólico en Manhattan',
+    short: 'Manhattan',
+    country: 'Nueva York, EE. UU.',
+    accent: '#7aa2ff',
+    wall: '#33405a',
+    wall2: '#41506c',
+    floor: '#775c48',
+    line: '#242a3f',
+    window: '#15243c',
+    rug: '#5a718d',
+    rug2: '#7e96b1',
+    trim: '#ccb08a',
+    mood: 'Lluvia, neón suave y skyline azul.',
+    time: 'night'
+  },
+  kyoto: {
+    name: 'Ático folk en Japón',
+    short: 'Kyoto',
+    country: 'Kyoto, Japón',
+    accent: '#d66f93',
+    wall: '#d3c2a8',
+    wall2: '#c6b394',
+    floor: '#846348',
+    line: '#5a4335',
+    window: '#f2d5da',
+    rug: '#8e6e5f',
+    rug2: '#b78f73',
+    trim: '#f4e5ca',
+    mood: 'Madera antigua, tatami y flores de cerezo.',
+    time: 'day'
+  },
+  igloo: {
+    name: 'Iglú ártico con pingüino',
+    short: 'Iglú',
+    country: 'Ártico fantástico',
+    accent: '#79d0e8',
+    wall: '#c7edf5',
+    wall2: '#d9f8fb',
+    floor: '#e7f9fb',
+    line: '#7eb4c5',
+    window: '#91d8e9',
+    rug: '#8fcde0',
+    rug2: '#b8e7f0',
+    trim: '#fff5ea',
+    mood: 'Auroras, hielo suave y mantas cálidas.',
+    time: 'night'
+  },
+  cottage: {
+    name: 'Cabaña entre pinos',
+    short: 'Cabaña',
+    country: 'Bosque del norte',
+    accent: '#7fc48d',
+    wall: '#556149',
+    wall2: '#667557',
+    floor: '#7c6246',
+    line: '#303a2b',
+    window: '#304c3d',
+    rug: '#607d5d',
+    rug2: '#7d9b74',
+    trim: '#dbc49a',
+    mood: 'Lámparas cálidas, madera y un bosque infinito.',
+    time: 'dusk'
+  },
+  observatory: {
+    name: 'Observatorio nocturno',
+    short: 'Observatorio',
+    country: 'Cima estelar',
+    accent: '#aa8fff',
+    wall: '#322a4d',
+    wall2: '#43365f',
+    floor: '#5e4d68',
+    line: '#181126',
+    window: '#1d1430',
+    rug: '#635885',
+    rug2: '#8d7ab8',
+    trim: '#e4d1a3',
+    mood: 'Cúpula astral, telescopio y cielo profundo.',
+    time: 'night'
+  }
 };
-const PETS = {cat:'Gato',dog:'Perro',penguin:'Pingüino',fox:'Zorro',rabbit:'Conejo',crow:'Cuervo'};
-function R(c,x,y,w,h,color){c.fillStyle=color;c.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));}
-function P(c,pts,color){c.fillStyle=color;c.beginPath();pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();c.fill();}
-function L(c,x1,y1,x2,y2,color,width=1){c.strokeStyle=color;c.lineWidth=width;c.beginPath();c.moveTo(x1+.5,y1+.5);c.lineTo(x2+.5,y2+.5);c.stroke();}
-function hash(a){let x=Math.sin(a*127.1+4.07)*43758.5453;return x-Math.floor(x);}
-function star(c,x,y,clr,r=1){R(c,x-r,y,2*r+1,1,clr);R(c,x,y-r,1,2*r+1,clr);}
-function sky(c,theme,time,w,h){
-  const sets={
-   day:{manhattan:['#85b3c9','#d4b4a8'],kyoto:['#a6d6ca','#f6e0ba'],igloo:['#6dacc9','#c8eef1'],forest:['#8fb6a1','#f3c6a0'],observatory:['#b1a1cd','#f2bcce']},
-   dusk:{manhattan:['#596b9a','#f1aa8d'],kyoto:['#8d91b0','#ebaca6'],igloo:['#566f9d','#b1d1d6'],forest:['#665a80','#e3ad7f'],observatory:['#5e4c8f','#d995af']},
-   night:{manhattan:['#14253f','#657398'],kyoto:['#203d59','#7f8095'],igloo:['#0c3151','#47758e'],forest:['#1b3037','#687361'],observatory:['#141d46','#514e8e']}
-  };
-  const [top,bottom]=sets[time][theme];
-  const hex=n=>parseInt(n,16), rgb=s=>[hex(s.slice(1,3)),hex(s.slice(3,5)),hex(s.slice(5,7))];
-  const a=rgb(top),b=rgb(bottom);
-  for(let y=0;y<h;y+=5){let t=Math.min(1,y/(h*.84)), cl='#'+a.map((v,i)=>Math.round(v+(b[i]-v)*t).toString(16).padStart(2,'0')).join(''); R(c,0,y,w,5,cl);}
-  if(time==='night'||time==='dusk'){
-   for(let i=0;i<57;i++){
-     let x=Math.floor(hash(i+12)*w),y=Math.floor(hash(i+117)*h*.69);
-     R(c,x,y,i%13===0?2:1,i%13===0?2:1,time==='night'?'#d8e5e7':'#fbe5d0');
-   }
-  }
-  if(time!=='night'){
-   let x=theme==='manhattan'?192:theme==='kyoto'?166:52, y=time==='day'?45:100;
-   R(c,x-12,y-12,24,24,time==='day'?'#fff3c1':'#ffbe94');
-   R(c,x-8,y-16,16,32,time==='day'?'#fff3c1':'#ffbe94');
-   R(c,x-16,y-8,32,16,time==='day'?'#fff3c1':'#ffbe94');
-  }else if(theme!=='observatory'){
-   R(c,179,34,18,18,'#f6e8c8');R(c,186,29,11,18,'#f6e8c8');R(c,185,43,10,8,'#f6e8c8');
-  }
+
+const PETS = {
+  cat: { name: 'Gato' },
+  dog: { name: 'Perro' },
+  penguin: { name: 'Pingüino' },
+  fox: { name: 'Zorro' },
+  rabbit: { name: 'Conejo' },
+  owl: { name: 'Búho' }
+};
+
+const ROOM_COLORS = {
+  movies: '#d07f71',
+  series: '#90a9c8',
+  books: '#d1b178',
+  games: '#7ec9c1',
+  comics: '#df9d64',
+  manga: '#d98bb5',
+  hobbies: '#99bf87',
+  memories: '#c6a0d8',
+  journal: '#86a6db'
+};
+
+const ROOM_LABELS = {
+  movies: 'Cine',
+  series: 'Series',
+  books: 'Biblioteca',
+  games: 'Juegos',
+  comics: 'Cómics',
+  manga: 'Manga',
+  hobbies: 'Hobbies',
+  memories: 'Recuerdos',
+  journal: 'Diario'
+};
+
+function px(ctx) {
+  ctx.imageSmoothingEnabled = false;
 }
-function mountain(c,base,color,peakx,peaky,amp=65){P(c,[[0,base],[peakx-amp,base],[peakx,peaky],[peakx+amp,base],[240,base]],color);}
-function pine(c,x,y,s=1,color='#27473e'){
- let W=16*s,H=47*s;
- R(c,x-2*s,y+29*s,4*s,19*s,'#463c3b');
- P(c,[[x,y],[x-W*.48,y+24*s],[x+W*.48,y+24*s]],color);
- P(c,[[x,y+13*s],[x-W*.72,y+38*s],[x+W*.72,y+38*s]],color);
+function R(ctx, x, y, w, h, c) { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); }
+function P(ctx, pts, c) { ctx.fillStyle = c; ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]); ctx.closePath(); ctx.fill(); }
+function C(ctx, x, y, r, c) { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); }
+function L(ctx, x1, y1, x2, y2, c, w = 1) { ctx.strokeStyle = c; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); }
+function star(ctx, x, y, c, s = 2) { R(ctx, x, y, s, s, c); R(ctx, x - 1, y + 1, s + 2, 1, c); R(ctx, x + 1, y - 1, 1, s + 2, c); }
+function scale(ctx, canvas, W = 320, H = 240) {
+  const sx = canvas.width / W;
+  const sy = canvas.height / H;
+  ctx.setTransform(sx, 0, 0, sy, 0, 0);
+  px(ctx);
 }
-function landscape(c, theme, time='night', weather=true, tick=0, w=240, h=305){
- c.save(); c.imageSmoothingEnabled=false;
- sky(c,theme,time,w,h);
- if(theme==='manhattan'){
-  R(c,0,216,240,89,time==='day'?'#657e91':'#243a54');
-  for(let i=0;i<26;i++){let x=i*11-5,bt=103+Math.floor(hash(i*3+22)*77);R(c,x,bt,13,210,'#273c53');R(c,x+2,bt+8,9,2,'#415870');}
-  for(let i=0;i<12;i++){
-    let x=i*23-9, top=128+Math.floor(hash(i+38)*72), height=304-top;
-    let col=i%3===0?'#293243':i%3===1?'#35445c':'#283b4f';
-    R(c,x,top,24,height,col);R(c,x+3,top-4,18,4,col);R(c,x+7,top-11,6,7,col);
-    if(i===4){R(c,x+10,top-35,2,25,'#778898');R(c,x+9,top-37,4,4,'#f4c3a2');}
-    for(let y=top+8;y<287;y+=13)for(let j=0;j<3;j++)if(hash(i*20+j+y)>0.22)R(c,x+4+j*7,y,3,5,(time==='day')?'#9cb6ba':hash(i+j+y)>0.3?'#f7c78c':'#8594a8');
+
+function landscape(ctx, themeKey, time = 'night', animate = false, W = 320, H = 180) {
+  const t = THEMES[themeKey] || THEMES.manhattan;
+  const night = time === 'night';
+  const dusk = time === 'dusk';
+  R(ctx, 0, 0, W, H, night ? '#101726' : dusk ? '#7a5470' : '#8cc6f6');
+  if (themeKey === 'observatory') R(ctx, 0, 0, W, H, night ? '#120d1e' : '#34284f');
+  if (themeKey === 'igloo') R(ctx, 0, 0, W, H, night ? '#125070' : '#7fdcf1');
+  if (themeKey === 'cottage') R(ctx, 0, 0, W, H, dusk ? '#6a7b58' : night ? '#203526' : '#86b18c');
+  if (themeKey === 'kyoto') R(ctx, 0, 0, W, H, night ? '#33496e' : '#c9d8ff');
+
+  if (night || themeKey === 'observatory') {
+    for (let i = 0; i < 36; i++) star(ctx, (i * 41) % W, 10 + (i * 17) % 65, i % 4 === 0 ? '#fff3a8' : '#ffffff', i % 5 === 0 ? 2 : 1);
   }
-  R(c,0,277,240,28,'#263040');R(c,0,279,240,3,'#76677a');
-  R(c,14,270,33,9,'#282b38');R(c,19,255,23,15,'#4d4850');R(c,16,252,28,3,'#85818b');R(c,29,248,2,5,'#716c80');
-  for(let i=0;i<9;i++)R(c,i*34-9,291,16,2,'#596176');
- }else if(theme==='kyoto'){
-  mountain(c,199,'#839fa3',62,127,102);mountain(c,216,'#658e90',170,115,104);
-  R(c,0,217,240,88,'#537c73');R(c,0,263,240,42,'#698c77');
-  for(let i=0;i<12;i++)R(c,i*22-6,238+Math.floor(hash(i)*9),17,2,'#9ab2a1');
-  // Pagoda roof lines and lanterns.
-  R(c,146,192,35,55,'#735a57');R(c,154,180,20,15,'#a5816c');
-  for(let k=0;k<3;k++){let y=183+k*18; P(c,[[140,y+8],[158,y],[171,y],[187,y+8],[184,y+11],[143,y+11]],'#3b5260');R(c,151,y+13,24,6,'#e5bb98');}
-  R(c,162,171,2,13,'#4b4d54');
-  // Cherry tree on left.
-  R(c,30,183,8,122,'#56484b');R(c,12,211,40,6,'#56484b');
-  for(let i=0;i<38;i++){
-    let xx=12+Math.floor(hash(i+12)*86),yy=128+Math.floor(hash(i+39)*85);
-    if((xx-43)*(xx-43)/2200+(yy-174)*(yy-174)/1800<1.7)R(c,xx,yy,5+i%2,4,i%4===0?'#f8dfd2':i%3===0?'#eeb4bd':'#f1c7ca');
+
+  if (themeKey === 'manhattan') {
+    R(ctx, 0, 132, W, 48, '#19283f');
+    const xs = [8, 36, 64, 92, 128, 164, 198, 234, 266, 290];
+    const hs = [55, 70, 62, 84, 72, 95, 68, 88, 76, 63];
+    xs.forEach((x, i) => {
+      R(ctx, x, 132 - hs[i], 20 + (i % 3) * 6, hs[i], '#22334d');
+      for (let wy = 0; wy < hs[i] - 10; wy += 9) {
+        for (let wx = 3; wx < 16 + (i % 3) * 6; wx += 7) {
+          if ((wx + wy + i) % 3) R(ctx, x + wx, 132 - hs[i] + 4 + wy, 3, 4, i % 2 ? '#f8d899' : '#f4f1d0');
+        }
+      }
+    });
+    R(ctx, 0, 132, W, 4, '#9db6d5');
+    if (animate) for (let i = 0; i < 70; i++) R(ctx, (i * 29) % W, (i * 19) % H, 1, 5, '#d6e7ff88');
   }
-  R(c,0,279,240,26,'#9aab8d');
-  for(let i=0;i<12;i++)R(c,i*23,278+(i%4)*4,12,2,'#d3b2ab');
- }else if(theme==='igloo'){
-  mountain(c,230,'#6b9db7',70,140,104);mountain(c,250,'#96c4d3',193,160,105);
-  R(c,0,243,240,62,'#cbebef');P(c,[[0,272],[45,250],[88,263],[141,244],[240,266],[240,305],[0,305]],'#e5f5f4');
-  for(let i=0;i<22;i++)R(c,Math.floor(hash(i+4)*240),246+Math.floor(hash(i+66)*55),4,2,'#a5cfda');
-  if(time==='night'){
-   for(let k=0;k<4;k++){
-    let col=['#61c8b4','#84dacc','#a18fc9','#61a6bb'][k];
-    for(let i=0;i<22;i++){
-      let x=i*13-9, y=53+k*14+Math.sin(i*.43+k)*20;
-      R(c,x,y,14,6,col);
+
+  if (themeKey === 'kyoto') {
+    R(ctx, 0, 125, W, 55, '#89b98d');
+    R(ctx, 0, 135, W, 45, '#7aa57a');
+    for (let i = 0; i < 5; i++) {
+      const x = 18 + i * 62;
+      R(ctx, x, 86, 6, 50, '#5e4936');
+      C(ctx, x + 3, 74, 18, '#d48da9');
+      C(ctx, x - 7, 81, 14, '#f0b2c5');
+      C(ctx, x + 14, 82, 14, '#efb5c8');
     }
-   }
+    R(ctx, 0, 144, W, 2, '#f1dcc3');
+    for (let i = 0; i < 18; i++) if (animate) R(ctx, (i * 31) % W, 42 + (i * 14) % 110, 3, 2, i % 2 ? '#f4c5d0' : '#f7dbe0');
   }
-  // Tiny distant snowhouse.
-  R(c,176,255,30,17,'#a4d3de');R(c,169,263,44,10,'#deeff1');R(c,186,260,11,13,'#55768b');
- }else if(theme==='forest'){
-  mountain(c,208,'#6a8180',79,122,112);mountain(c,226,'#446c67',184,144,130);
-  R(c,0,216,240,89,'#315349');
-  for(let i=0;i<17;i++)pine(c,Math.floor(hash(i+78)*255),180+Math.floor(hash(i+23)*28),.7+hash(i+6)*.8,i%2?'#234d42':'#315b49');
-  R(c,81,240,85,54,'#8f6d4c');P(c,[[74,242],[125,201],[173,242]],'#514842');P(c,[[88,237],[125,209],[160,237]],'#7f5644');
-  R(c,112,264,20,30,'#40392f');R(c,138,251,16,13,'#f4d59b');R(c,141,254,10,8,'#eac078');
-  for(let i=0;i<17;i++)R(c,Math.floor(hash(i+41)*240),289+Math.floor(hash(i+9)*15),6,3,'#59785a');
- }else if(theme==='observatory'){
-  // Huge ringed planet.
-  R(c,146,67,40,42,'#b7a1cc');R(c,140,75,52,27,'#b7a1cc');R(c,154,60,24,48,'#d9aac4');R(c,147,88,45,9,'#9279b4');
-  for(let i=0;i<3;i++){L(c,109+i*2,105+i*2,214+i*2,55+i*2,'#f6dbca',2);}
-  mountain(c,218,'#3e4c79',57,154,110);mountain(c,250,'#5a4d79',174,160,116);
-  R(c,0,245,240,60,'#343451');for(let i=0;i<12;i++)R(c,i*25+3,280+i%4*5,11,3,'#8976a0');
-  // Distant observatory.
-  R(c,30,215,63,65,'#5f5a76');R(c,23,218,75,6,'#342f4a');R(c,45,192,31,30,'#98a1bf');R(c,50,185,21,6,'#b3c2d4');R(c,58,180,4,9,'#b3c2d4');R(c,53,211,15,9,'#353650');
- }
- if(weather){
-   const n=theme==='manhattan'?58:theme==='igloo'?42:theme==='kyoto'?23:theme==='forest'?13:0;
-   for(let i=0;i<n;i++){
-    let x=Math.floor((hash(i+129)*w+((tick*(theme==='manhattan'?5:.75))*(i%3+1)))%w);
-    let y=Math.floor((hash(i+401)*h+(tick*(theme==='manhattan'?10:2))*(i%4+1))%h);
-    if(theme==='manhattan')R(c,x,y,1,5,time==='day'?'#c6dce5a8':'#a3bcd6a0');
-    if(theme==='igloo')R(c,x,y,2,2,'#edfbf5');
-    if(theme==='kyoto')R(c,x,y,3,2,i%3===0?'#edabbf':'#f8d3d7');
-    if(theme==='forest')R(c,x,y,1,3,'#daecbe');
-   }
- }
- c.restore();
+
+  if (themeKey === 'igloo') {
+    R(ctx, 0, 128, W, 52, '#d4f5fb');
+    P(ctx, [[22, 136], [70, 88], [120, 136]], '#eafcff');
+    P(ctx, [[90, 136], [150, 72], [220, 136]], '#f7ffff');
+    P(ctx, [[188, 136], [260, 90], [320, 136]], '#dff7fc');
+    C(ctx, 238, 40, 16, '#f4fbff');
+    R(ctx, 52, 105, 56, 32, '#beeef7');
+    C(ctx, 80, 105, 26, '#d9fbff');
+    R(ctx, 74, 116, 14, 9, '#8ed4e3');
+    if (animate) for (let i = 0; i < 40; i++) R(ctx, (i * 27) % W, (i * 17) % H, 2, 2, '#ffffff');
+    if (night) {
+      P(ctx, [[20, 35], [90, 18], [160, 38], [220, 16], [300, 32], [320, 42], [0, 42]], '#79dcb8');
+      P(ctx, [[10, 45], [85, 30], [175, 50], [245, 24], [320, 40], [320, 58], [0, 58]], '#b08fff88');
+    }
+  }
+
+  if (themeKey === 'cottage') {
+    R(ctx, 0, 125, W, 55, '#466847');
+    for (let i = 0; i < 8; i++) {
+      const x = 15 + i * 38;
+      P(ctx, [[x, 130], [x + 18, 90], [x + 36, 130]], i % 2 ? '#7eb57d' : '#6ca06e');
+      R(ctx, x + 15, 126, 6, 18, '#54402d');
+    }
+    if (dusk) C(ctx, 255, 38, 12, '#ffd7a3');
+    if (animate) for (let i = 0; i < 18; i++) R(ctx, (i * 23) % W, 60 + (i * 13) % 68, 2, 4, '#e8f8c4');
+  }
+
+  if (themeKey === 'observatory') {
+    R(ctx, 0, 136, W, 44, '#1c1528');
+    P(ctx, [[0, 135], [50, 120], [110, 138], [160, 118], [230, 136], [280, 126], [320, 136], [320, 180], [0, 180]], '#281e39');
+    R(ctx, 120, 95, 86, 44, '#625979');
+    C(ctx, 163, 95, 43, '#8278a0');
+    R(ctx, 155, 75, 15, 22, '#c1b6d5');
+    R(ctx, 150, 118, 25, 14, '#22182f');
+  }
 }
-function renderLandscape(canvas,theme,time,weather,tick){
- if(!canvas)return;const c=canvas.getContext('2d'); if(!c)return; c.clearRect(0,0,canvas.width,canvas.height); landscape(c,theme,time,weather,tick,canvas.width,canvas.height);
+
+function drawPet(ctx, pet, x, y) {
+  if (pet === 'cat') {
+    R(ctx, x + 8, y + 8, 24, 16, '#7f8fa3');
+    P(ctx, [[x + 10, y + 8], [x + 16, y], [x + 18, y + 8]], '#7f8fa3');
+    P(ctx, [[x + 24, y + 8], [x + 30, y], [x + 32, y + 8]], '#7f8fa3');
+    R(ctx, x + 13, y + 14, 3, 3, '#111'); R(ctx, x + 24, y + 14, 3, 3, '#111'); R(ctx, x + 19, y + 19, 4, 2, '#d69a9f');
+    R(ctx, x + 30, y + 18, 9, 3, '#7f8fa3');
+  } else if (pet === 'dog') {
+    R(ctx, x + 8, y + 9, 26, 15, '#b99166'); R(ctx, x + 10, y + 3, 22, 14, '#cfaa7f');
+    R(ctx, x + 6, y + 8, 6, 13, '#875f4f'); R(ctx, x + 31, y + 8, 6, 13, '#875f4f');
+    R(ctx, x + 14, y + 14, 3, 3, '#111'); R(ctx, x + 25, y + 14, 3, 3, '#111'); R(ctx, x + 18, y + 19, 6, 3, '#ead7bd');
+  } else if (pet === 'penguin') {
+    R(ctx, x + 12, y + 3, 18, 30, '#263247'); R(ctx, x + 15, y + 8, 12, 19, '#edf5f3');
+    R(ctx, x + 16, y + 13, 3, 3, '#111'); R(ctx, x + 24, y + 13, 3, 3, '#111'); R(ctx, x + 19, y + 18, 7, 3, '#e6a36e');
+    R(ctx, x + 11, y + 31, 8, 3, '#e9b07f'); R(ctx, x + 23, y + 31, 8, 3, '#e9b07f');
+  } else if (pet === 'fox') {
+    R(ctx, x + 8, y + 8, 26, 16, '#c46c4d'); P(ctx, [[x + 11, y + 8], [x + 17, y], [x + 18, y + 8]], '#c46c4d'); P(ctx, [[x + 24, y + 8], [x + 30, y], [x + 31, y + 8]], '#c46c4d');
+    R(ctx, x + 12, y + 15, 3, 3, '#111'); R(ctx, x + 25, y + 15, 3, 3, '#111'); R(ctx, x + 17, y + 20, 8, 3, '#f0dfc0'); R(ctx, x + 31, y + 18, 10, 5, '#c46c4d'); R(ctx, x + 38, y + 19, 3, 4, '#f0dfc0');
+  } else if (pet === 'rabbit') {
+    R(ctx, x + 12, y, 6, 18, '#ebe0d2'); R(ctx, x + 24, y, 6, 18, '#ebe0d2');
+    R(ctx, x + 10, y + 12, 24, 16, '#f2e8da'); R(ctx, x + 14, y + 18, 3, 3, '#111'); R(ctx, x + 25, y + 18, 3, 3, '#111'); R(ctx, x + 19, y + 23, 4, 2, '#d79aa6');
+  } else {
+    R(ctx, x + 10, y + 5, 22, 20, '#4a4658'); R(ctx, x + 14, y, 6, 11, '#4a4658'); R(ctx, x + 22, y, 6, 11, '#4a4658');
+    R(ctx, x + 16, y + 12, 3, 3, '#f6ebd1'); R(ctx, x + 23, y + 12, 3, 3, '#f6ebd1'); R(ctx, x + 17, y + 13, 1, 1, '#111'); R(ctx, x + 24, y + 13, 1, 1, '#111'); R(ctx, x + 18, y + 18, 8, 3, '#d7aa76');
+  }
 }
-function bookSpines(c,x,y,number,theme){
- const cols=['#d8ae8c','#7f9a9f','#b17f80','#e4cf97','#959fbd','#adad8c','#ca9474'];
- for(let i=0;i<number;i++){let xx=x+i*4,hh=19+(i*7)%11;R(c,xx,y-hh,3,hh,cols[i%7]);R(c,xx+1,y-hh+4,1,2,'#f7dfb3');}
+
+function drawInteriorBase(ctx, themeKey) {
+  const t = THEMES[themeKey] || THEMES.manhattan;
+  R(ctx, 0, 0, 320, 240, t.wall);
+  R(ctx, 0, 0, 320, 12, t.wall2);
+  R(ctx, 0, 160, 320, 80, t.floor);
+  R(ctx, 0, 156, 320, 4, t.line);
+  for (let x = 0; x < 320; x += 40) R(ctx, x, 160, 2, 80, t.line);
+  for (let y = 175; y < 240; y += 21) R(ctx, 0, y, 320, 1, t.line);
+
+  if (themeKey === 'manhattan') {
+    for (let y = 18; y < 156; y += 18) L(ctx, 0, y, 320, y, '#4d5b75');
+    R(ctx, 18, 18, 92, 70, '#273652'); R(ctx, 18, 18, 92, 4, '#90a6c4');
+    landscape(ctx, themeKey, 'night', true, 88, 66); // decorative offscale not exact but okay? overwritten maybe.
+  }
 }
-function pet(c,animal='cat',x=0,y=0,scale=1,theme='manhattan',blink=false){
- c.save(); c.translate(x,y); c.scale(scale,scale);
- const dark='#263044',black='#192432',pink='#d7a69c',white='#e8d9c7';
- const eyes=blink?2:3;
- if(animal==='cat'){
-  R(c,5,20,28,14,dark);R(c,2,16,32,16,'#77838d');R(c,3,25,32,8,'#64717f');
-  R(c,4,7,9,12,'#77838d');R(c,23,7,9,12,'#77838d');R(c,8,3,5,10,'#77838d');R(c,26,3,4,10,'#77838d');
-  R(c,7,16,25,14,'#92a4ab');R(c,11,20,3,eyes,black);R(c,24,20,3,eyes,black);R(c,19,26,3,2,pink);
-  R(c,31,25,6,4,'#77838d');R(c,35,20,4,7,'#77838d');
- } else if(animal==='dog'){
-  R(c,6,19,29,13,'#b28c67');R(c,5,25,31,8,'#997358');R(c,8,8,25,21,'#c7a37a');
-  R(c,3,10,8,18,'#8a6452');R(c,30,10,8,17,'#8a6452');R(c,12,18,3,eyes,black);R(c,27,18,3,eyes,black);
-  R(c,17,24,9,6,'#ecd4b2');R(c,20,24,4,3,dark);R(c,33,27,6,4,'#c7a37a');
- } else if(animal==='penguin'){
-  R(c,11,4,21,33,'#252f49');R(c,7,9,30,22,'#252f49');R(c,13,12,18,20,'#e4eee6');
-  R(c,13,15,3,eyes,'#e0ede7');R(c,28,15,3,eyes,'#e0ede7');R(c,15,17,3,2,black);R(c,27,17,3,2,black);
-  R(c,19,22,8,3,'#e3a568');R(c,11,35,10,3,'#e6a46e');R(c,25,35,10,3,'#e6a46e');R(c,7,22,5,9,'#303955');
- }else if(animal==='fox'){
-  R(c,4,12,31,21,'#bd6f4d');R(c,4,6,10,11,'#bd6f4d');R(c,25,6,10,11,'#bd6f4d');R(c,6,8,4,6,'#e5a7a0');R(c,29,8,4,6,'#e5a7a0');
-  R(c,9,24,23,10,'#e6d4b3');R(c,14,19,3,eyes,black);R(c,25,19,3,eyes,black);R(c,20,26,4,3,black);
-  R(c,32,27,10,8,'#bd6f4d');R(c,39,25,5,5,'#ece3ca');
- }else if(animal==='rabbit'){
-  R(c,9,2,8,18,'#e7dacc');R(c,24,2,8,18,'#e7dacc');R(c,12,5,3,12,'#deaead');R(c,27,5,3,12,'#deaead');
-  R(c,6,19,33,15,'#e7dacc');R(c,9,15,28,16,'#f6e8d7');R(c,14,22,3,eyes,black);R(c,27,22,3,eyes,black);R(c,21,27,3,2,pink);
- }else{
-  R(c,8,14,30,18,'#37354d');R(c,12,8,22,18,'#4d4b61');R(c,27,19,13,6,'#d7ab77');R(c,21,18,3,eyes,'#ece1c7');R(c,22,19,2,2,black);
-  R(c,6,19,9,9,'#353348');R(c,17,30,3,6,'#bc977b');R(c,28,30,3,6,'#bc977b');
- }
- c.restore();
+
+function drawWindowFrame(ctx, themeKey, time, x = 112, y = 26, w = 96, h = 72) {
+  const t = THEMES[themeKey] || THEMES.manhattan;
+  R(ctx, x - 6, y - 6, w + 12, h + 12, t.line);
+  R(ctx, x - 2, y - 2, w + 4, h + 4, t.trim);
+  // render landscape into clipped miniature canvas style
+  const off = document.createElement('canvas');
+  off.width = w; off.height = h;
+  const octx = off.getContext('2d');
+  px(octx); landscape(octx, themeKey, time, true, w, h);
+  ctx.drawImage(off, x, y, w, h);
+  R(ctx, x + Math.floor(w / 2) - 2, y, 4, h, t.line);
+  R(ctx, x, y + Math.floor(h / 2) - 2, w, 4, t.line);
 }
-function pixelRoom(canvas,theme='manhattan',animal='cat',counts={},time='night',tick=0){
- if(!canvas)return;
- const ctx=canvas.getContext('2d'); if(!ctx)return;
- const p=THEMES[theme]||THEMES.manhattan;const c=ctx;
- const B=()=>{};
- c.imageSmoothingEnabled=false;c.clearRect(0,0,240,270);
- // Wallpaper with dither and beams.
- R(c,0,0,240,270,p.wall);R(c,0,0,240,11,p.wallLight);R(c,0,11,240,3,p.woodDark);
- for(let y=15;y<180;y+=15)for(let x=0;x<240;x+=16){if(hash(x*3+y)>0.64)R(c,x+2,y+4,2,2,p.wallLight);}
- if(theme==='manhattan')for(let y=22;y<178;y+=19){L(c,0,y,240,y,'#52607a',1);for(let x=y%2?5:16;x<240;x+=29)R(c,x,y+2,1,13,'#52607a');}
- if(theme==='igloo')for(let y=20;y<174;y+=17){L(c,0,y,240,y,'#b1d3d9',1);for(let x=(y%34?4:17);x<240;x+=28)R(c,x,y+1,2,15,'#accbd3');}
- if(theme==='forest')for(let x=0;x<240;x+=32){R(c,x,8,3,172,'#4e473b');R(c,x+5,15,1,163,'#907858');}
- if(theme==='kyoto'){for(let x of [9,83,175,229])R(c,x,9,4,173,'#506d67');R(c,0,16,240,4,'#b0aa87');}
- if(theme==='observatory')for(let i=0;i<15;i++)star(c,Math.floor(hash(i+29)*240),Math.floor(hash(i+3)*157)+14,'#827b99');
- R(c,0,179,240,91,p.floor);R(c,0,176,240,8,p.woodDark);R(c,0,178,240,3,p.frame);
- for(let y=192;y<270;y+=23){R(c,0,y,240,1,p.floorLine);for(let x=(y%3)*8;x<240;x+=45)R(c,x,y+1,1,22,p.floorLine);}
- // Floor rug, pixel diamond border.
- R(c,75,222,125,39,p.woodDark);R(c,78,225,118,32,p.rug);R(c,82,229,110,24,p.rug2);R(c,88,233,98,15,p.rug);R(c,103,238,68,5,p.rug2);
- // Window: outdoor miniature.
- R(c,89,18,83,99,p.woodDark);R(c,93,22,75,90,p.frame);R(c,97,26,67,82,'#25354b');
- const off=document.createElement('canvas');off.width=240;off.height=305;const oc=off.getContext('2d');landscape(oc,theme,time,true,tick,240,305);
- c.drawImage(off,5,12,230,280,97,26,67,82);
- R(c,94,21,73,4,p.light);R(c,94,109,75,5,p.woodDark);R(c,128,25,4,83,p.frame);R(c,98,68,66,4,p.frame);
- R(c,91,18,80,3,p.frame);R(c,87,113,88,6,p.woodDark);R(c,90,113,84,2,p.light);
- R(c,100,29,2,34,'#ffffff3a');R(c,103,29,1,15,'#ffffff2b');
- // Tiny curtains.
- if(theme==='kyoto'){R(c,94,24,6,41,'#d2b9a8');R(c,159,24,7,40,'#d2b9a8');}
- if(theme==='manhattan'){R(c,94,24,4,20,'#b38c87');R(c,164,24,3,20,'#b38c87');}
- if(theme==='observatory'){R(c,95,24,4,46,'#8c7599');R(c,163,24,4,46,'#8c7599');}
- // Shelving cabinet.
- R(c,9,25,76,137,p.woodDark);R(c,12,28,70,130,p.wood);R(c,17,33,61,121,p.out);
- for(let y of [68,105,143]){R(c,15,y,65,5,p.wood);R(c,15,y+5,65,2,p.woodDark);}
- bookSpines(c,20,67,Math.min(13,Math.max(5,(counts.books||0)+(counts.comics||0)+(counts.manga||0)+4)),theme);
- R(c,64,54,10,12,'#708b9d');R(c,65,52,8,3,'#ebcfa8');R(c,70,49,3,4,'#e8bc82');
- R(c,20,98,22,5,'#9aa4a7');R(c,22,91,18,7,'#b49e92');R(c,47,79,13,19,'#d7ae96');R(c,50,77,7,4,'#e5d0b7');R(c,64,84,9,14,'#91a8a4');
- R(c,22,126,28,5,'#d0ab97');R(c,24,117,24,9,'#829d9b');R(c,53,116,18,12,'#cdbd98');R(c,53,111,18,5,'#7c8e9b');
- R(c,20,146,53,8,p.woodDark);R(c,24,149,6,4,p.light);R(c,68,149,6,4,p.light);
- // Small picture on far right.
- R(c,182,28,45,43,p.woodDark);R(c,185,31,39,37,p.frame);R(c,188,34,33,31,'#3e5570');
- if(theme==='observatory'){star(c,203,42,'#fff1c4',4);R(c,192,54,27,6,'#876d9f');}
- else {R(c,195,46,21,13,p.wallLight);P(c,[[190,60],[200,48],[211,62]],p.rug);}
- // Hanging lamp.
- R(c,193,0,2,12,p.frame);R(c,184,12,21,4,p.woodDark);R(c,189,16,12,11,p.light);R(c,185,27,20,3,p.woodDark);R(c,188,30,14,3,'#ffffff30');
- // Television and film corner.
- R(c,164,98,69,63,p.woodDark);R(c,169,101,59,48,'#192535');R(c,173,105,48,40,'#4f6576');R(c,177,109,40,32,'#172e4a');
- // VHS playback screen with theme colors.
- R(c,180,113,34,22,'#304862');R(c,181,125,32,10,p.rug);R(c,185,116,9,9,'#dfc7a4');R(c,191,117,4,11,'#8e667c');R(c,198,119,11,14,'#85929a');
- R(c,207,137,7,2,'#e8c5a7');R(c,225,110,3,4,p.light);R(c,223,122,4,4,p.frame);
- R(c,174,152,47,7,p.woodDark);R(c,182,159,33,4,p.wood);R(c,177,162,45,7,p.woodDark);
- R(c,177,172,54,12,p.wood);R(c,180,173,48,8,p.out);
- for(let i=0;i<4;i++){R(c,184+i*10,175,7,4,['#a07a82','#718ca5','#caa283','#8c9e8f'][i]);}
- // Game console, sitting near screen.
- R(c,175,191,55,11,'#c3b7ab');R(c,180,193,43,6,'#4b5362');R(c,194,194,8,2,p.light);
- R(c,178,205,19,12,'#6a7782');R(c,200,205,19,12,'#6a7782');R(c,183,210,8,2,'#f0d1a0');R(c,186,207,2,8,'#f0d1a0');
- for(let [x,y] of [[209,209],[214,213]])R(c,x,y,3,3,'#f0c48f');
- // Hobby work desk.
- R(c,8,177,103,9,p.woodDark);R(c,11,171,96,7,p.wood);R(c,16,185,7,41,p.woodDark);R(c,96,185,7,41,p.woodDark);
- R(c,23,183,67,22,p.woodDark);R(c,26,184,61,19,p.wood);R(c,34,192,5,4,p.light);R(c,79,192,5,4,p.light);
- // Model, brushes, paints.
- R(c,32,156,21,13,'#778d82');R(c,35,152,15,5,'#e3c6a6');R(c,39,147,8,6,'#9eb8a4');R(c,43,142,2,6,'#d5ad87');
- for(let i=0;i<4;i++){R(c,57+i*9,163,6,8,['#93b4a7','#ce9b8c','#d6c79f','#a6a2ca'][i]);R(c,58+i*9,160,4,3,'#e3d8c4');}
- R(c,16,163,5,12,'#c7a18a');R(c,18,150,1,13,'#f9d9ac');R(c,21,155,1,10,'#a9d4d9');
- R(c,92,152,3,19,'#d3bf96');R(c,87,155,13,4,'#d3bf96');R(c,90,158,7,2,'#efd2a9');
- // Scattered hobby tools on table.
- R(c,38,169,16,2,'#b0c7c0');R(c,55,170,13,2,'#eed5ab');
- // Framed record album and notebook.
- R(c,125,161,26,26,p.woodDark);R(c,128,164,20,19,'#bfaaa0');R(c,130,165,16,16,'#3f4b65');R(c,134,169,9,9,'#d4a88a');R(c,138,172,3,3,'#36465a');
- R(c,120,187,39,10,'#d6bca1');R(c,123,190,34,4,'#8e788d');R(c,151,187,3,10,'#65526e');
- // A plant on sill.
- R(c,152,105,7,6,'#c49e89');R(c,155,92,2,14,'#5e9b76');R(c,151,94,4,7,'#71a584');R(c,157,92,4,5,'#638f7a');
- // Floor scattered pixels.
- for(let i=0;i<15;i++){let x=7+i*17,y=235+Math.floor(hash(i+9)*31); R(c,x,y,3,1,p.floorLine);}
- // Pet and cushion.
- R(c,90,218,57,22,p.woodDark);R(c,94,220,50,15,p.rug2);R(c,96,232,47,5,p.rug);
- pet(c,animal,98,201,1.1,theme,Math.floor(tick)%9===0);
- // Foreground shelf / postcard.
- R(c,7,239,38,24,p.woodDark);R(c,10,242,32,18,p.frame);R(c,13,244,26,14,p.wallLight);R(c,14,251,24,2,p.light);
- R(c,197,237,32,23,p.woodDark);R(c,201,239,24,19,p.wood);R(c,206,232,13,10,'#a6ad98');R(c,209,230,7,4,'#e9d0b2');
- // Corners and shadow border.
- R(c,0,0,4,270,p.out);R(c,236,0,4,270,p.out);R(c,0,266,240,4,p.out);
+
+function drawHub(canvas, themeKey, pet, counts = {}, time = 'night') {
+  const ctx = canvas.getContext('2d'); if (!ctx) return; ctx.clearRect(0, 0, canvas.width, canvas.height); scale(ctx, canvas, 320, 360);
+  const t = THEMES[themeKey] || THEMES.manhattan;
+  R(ctx, 0, 0, 320, 360, t.wall);
+  R(ctx, 0, 0, 320, 170, t.wall2);
+  R(ctx, 0, 170, 320, 190, t.floor);
+  R(ctx, 0, 166, 320, 4, t.line);
+  for (let y = 15; y < 164; y += themeKey === 'igloo' ? 20 : 18) L(ctx, 0, y, 320, y, themeKey === 'igloo' ? '#b7dde5' : themeKey === 'kyoto' ? '#c8b090' : themeKey === 'observatory' ? '#544671' : '#4f5c78');
+  if (themeKey === 'kyoto') {
+    for (let x = 18; x < 320; x += 74) R(ctx, x, 12, 5, 150, '#735844');
+  }
+  if (themeKey === 'cottage') {
+    for (let x = 8; x < 320; x += 44) R(ctx, x, 0, 5, 166, '#4c4030');
+  }
+  if (themeKey === 'observatory') {
+    for (let i = 0; i < 25; i++) star(ctx, (i * 37) % 320, 16 + (i * 13) % 120, i % 3 ? '#b6a5ff' : '#ffeb9d', 1);
+  }
+  drawWindowFrame(ctx, themeKey, time, 116, 20, 92, 76);
+
+  // Big attic corners
+  // left library tower
+  R(ctx, 18, 36, 72, 146, '#44372e'); R(ctx, 22, 40, 64, 138, '#6c5547');
+  for (let y = 70; y < 172; y += 30) R(ctx, 22, y, 64, 3, '#44372e');
+  for (let i = 0; i < 22; i++) R(ctx, 28 + (i % 7) * 7, 48 + Math.floor(i / 7) * 31, 5, 20, ['#b67c6e','#d0b57c','#85a0b4','#93af7d','#c89db4','#9a7e6d','#5f788a'][i % 7]);
+
+  // right cinema stack
+  R(ctx, 230, 46, 68, 98, '#3b3042'); R(ctx, 236, 52, 56, 40, '#111923'); R(ctx, 240, 56, 48, 32, '#3a5975');
+  R(ctx, 246, 60, 16, 12, '#c1c6b2'); R(ctx, 263, 60, 18, 20, '#78607f'); R(ctx, 234, 96, 58, 6, '#261d2a'); R(ctx, 246, 105, 34, 4, '#7f95a6');
+  R(ctx, 245, 117, 40, 18, '#594c61'); R(ctx, 252, 123, 8, 6, '#d6b38f'); R(ctx, 265, 123, 14, 8, '#8aa7be');
+
+  // center rug and hobby desk
+  R(ctx, 72, 255, 176, 52, t.line); R(ctx, 76, 259, 168, 44, t.rug); R(ctx, 86, 268, 148, 25, t.rug2);
+  R(ctx, 25, 188, 112, 10, '#46392f'); R(ctx, 30, 181, 104, 7, '#7f654f'); R(ctx, 40, 198, 9, 44, '#46392f'); R(ctx, 113, 198, 9, 44, '#46392f');
+  R(ctx, 46, 174, 24, 11, '#94b6a0'); R(ctx, 74, 172, 8, 14, '#d2b49b'); R(ctx, 78, 168, 3, 5, '#6aa6a7');
+  for (let i=0;i<4;i++) { R(ctx, 84+i*10, 175, 7, 9, ['#89a79c','#d29888','#d9c089','#9a91cb'][i]); R(ctx, 85+i*10, 172, 5, 3, '#efe2cd'); }
+
+  // memory corkboard
+  R(ctx, 112, 116, 94, 40, '#473a33'); R(ctx, 116, 120, 86, 32, '#bc9d76');
+  R(ctx, 124, 126, 18, 12, '#f4efe8'); R(ctx, 148, 124, 12, 16, '#e4d4b2'); R(ctx, 165, 128, 17, 11, '#f0cad7'); R(ctx, 186, 123, 11, 16, '#d3e2ec');
+
+  // gamer corner
+  R(ctx, 208, 180, 90, 50, '#2d3045'); R(ctx, 214, 186, 36, 27, '#94a8bf'); R(ctx, 218, 190, 28, 19, '#24364a');
+  R(ctx, 260, 192, 26, 13, '#cbc0b4'); R(ctx, 264, 206, 18, 5, '#4f5668'); R(ctx, 257, 216, 34, 8, '#6b7384');
+  R(ctx, 218, 222, 13, 8, '#7a8d7c'); R(ctx, 235, 222, 13, 8, '#816a8f'); R(ctx, 252, 222, 13, 8, '#b58a63');
+
+  // pet cushion
+  R(ctx, 134, 298, 56, 25, '#4c4057'); R(ctx, 138, 302, 48, 17, t.rug2); drawPet(ctx, pet, 144, 278);
+
+  // category markers/plaques
+  const plaques = [
+    ['books', 18, 184], ['hobbies', 32, 246], ['memories', 124, 159], ['movies', 244, 148], ['games', 248, 232], ['journal', 142, 220], ['series', 212, 146], ['comics', 20, 228], ['manga', 208, 146]
+  ];
+  plaques.forEach(([k, x, y]) => {
+    R(ctx, x, y, 34, 11, ROOM_COLORS[k]);
+    R(ctx, x + 1, y + 1, 32, 9, '#11111122');
+  });
 }
-function previewTheme(canvas,theme){
- const c=canvas.getContext('2d');c.imageSmoothingEnabled=false;c.clearRect(0,0,240,150);
- const off=document.createElement('canvas');off.width=240;off.height=305;const oc=off.getContext('2d');landscape(oc,theme,theme==='kyoto'?'day':theme==='forest'?'dusk':'night',false,0,240,305);c.drawImage(off,0,0,240,305,0,0,240,150);
+
+function drawRoom(canvas, themeKey, roomKey, pet, time = 'night') {
+  const ctx = canvas.getContext('2d'); if (!ctx) return; ctx.clearRect(0, 0, canvas.width, canvas.height); scale(ctx, canvas, 320, 220);
+  const t = THEMES[themeKey] || THEMES.manhattan;
+  R(ctx, 0, 0, 320, 220, t.wall);
+  R(ctx, 0, 0, 320, 150, t.wall2);
+  R(ctx, 0, 150, 320, 70, t.floor);
+  R(ctx, 0, 146, 320, 4, t.line);
+  if (themeKey === 'kyoto') for (let x = 0; x < 320; x += 64) { R(ctx, x, 0, 4, 146, '#7b5f46'); R(ctx, x, 44, 64, 2, '#e6d3b5'); }
+  if (themeKey === 'cottage') for (let x = 0; x < 320; x += 32) R(ctx, x, 0, 2, 146, '#50412f');
+  if (themeKey === 'observatory') for (let i = 0; i < 18; i++) star(ctx, (i * 47) % 320, 18 + (i * 19) % 65, i % 2 ? '#c9bcff' : '#fff1af', 1);
+  drawWindowFrame(ctx, themeKey, time, 210, 24, 82, 62);
+  R(ctx, 44, 170, 234, 28, '#00000020');
+
+  switch (roomKey) {
+    case 'books':
+      R(ctx, 18, 18, 100, 128, '#4b3b2e'); R(ctx, 23, 23, 90, 118, '#705845');
+      for (let y = 52; y < 138; y += 28) R(ctx, 23, y, 90, 3, '#4b3b2e');
+      for (let i = 0; i < 34; i++) R(ctx, 30 + (i % 10) * 7, 30 + Math.floor(i / 10) * 30, 5, 18, ['#c9856f','#7ea2bd','#d4b378','#9ab783','#d1a1be','#936f5a'][i % 6]);
+      R(ctx, 126, 118, 58, 24, '#a07d5b'); R(ctx, 131, 108, 48, 12, '#d6c6ac'); R(ctx, 136, 143, 38, 5, '#5b4635');
+      break;
+    case 'movies':
+      R(ctx, 26, 28, 124, 76, '#2d2437'); R(ctx, 34, 36, 108, 60, '#ecdfd0'); R(ctx, 44, 46, 88, 40, '#819cb8');
+      R(ctx, 168, 38, 42, 82, '#57464f'); R(ctx, 174, 44, 30, 67, '#201722'); R(ctx, 184, 117, 10, 28, '#57464f');
+      R(ctx, 46, 125, 108, 20, '#755b68'); R(ctx, 55, 118, 90, 14, '#b8a0a4'); R(ctx, 70, 115, 15, 5, '#d8c189'); R(ctx, 103, 115, 21, 5, '#9e8298');
+      break;
+    case 'series':
+      R(ctx, 28, 44, 96, 74, '#352a37'); R(ctx, 34, 50, 84, 58, '#9bacbf'); R(ctx, 40, 56, 72, 46, '#394d62');
+      R(ctx, 150, 102, 52, 28, '#8b6a57'); R(ctx, 156, 92, 40, 12, '#e1c8a0'); R(ctx, 214, 56, 30, 50, '#4b5967'); R(ctx, 248, 56, 30, 50, '#4b5967');
+      R(ctx, 204, 111, 84, 24, '#7f667a'); R(ctx, 212, 103, 68, 12, '#c6afc5');
+      break;
+    case 'games':
+      R(ctx, 40, 48, 76, 56, '#2e2b3f'); R(ctx, 45, 53, 66, 46, '#8ea3ba'); R(ctx, 51, 59, 54, 34, '#203545');
+      R(ctx, 135, 50, 46, 75, '#47344d'); R(ctx, 141, 58, 34, 55, '#6fc1c0'); R(ctx, 145, 62, 26, 20, '#264a53');
+      R(ctx, 194, 118, 74, 14, '#d4c6bb'); R(ctx, 202, 132, 58, 8, '#5d6777'); R(ctx, 207, 121, 10, 5, '#f0cca5');
+      R(ctx, 196, 98, 28, 16, '#7b8f7e'); R(ctx, 230, 98, 28, 16, '#9875aa');
+      break;
+    case 'comics':
+      R(ctx, 28, 28, 80, 105, '#54433a'); R(ctx, 34, 34, 68, 92, '#cba77b');
+      for (let i = 0; i < 8; i++) { R(ctx, 40 + (i % 4) * 15, 42 + Math.floor(i / 4) * 34, 12, 28, ['#d26f5c','#f2b36d','#78a4e0','#92b685','#d985b1','#87cad0','#cfa776','#b592d6'][i]); }
+      R(ctx, 132, 52, 58, 78, '#f0e6d8'); R(ctx, 142, 62, 38, 8, '#e58c58'); R(ctx, 142, 76, 38, 8, '#6fa2de'); R(ctx, 142, 90, 23, 23, '#d5d1c2');
+      break;
+    case 'manga':
+      R(ctx, 22, 106, 110, 20, '#725848'); R(ctx, 30, 91, 95, 18, '#f1e6d2'); R(ctx, 36, 72, 24, 19, '#d6c2ad');
+      R(ctx, 170, 32, 60, 102, '#5e4a3f'); R(ctx, 176, 38, 48, 92, '#e8d9ca');
+      for (let i = 0; i < 12; i++) R(ctx, 183 + (i % 4) * 9, 47 + Math.floor(i / 4) * 24, 6, 18, ['#f1adc8','#a5c3ec','#d8b37a','#8eb892'][i % 4]);
+      R(ctx, 54, 34, 74, 58, '#f6d9e2'); R(ctx, 64, 44, 54, 38, '#cf7ca4');
+      break;
+    case 'hobbies':
+      R(ctx, 22, 98, 118, 10, '#4b3b2f'); R(ctx, 28, 90, 106, 8, '#8b715b'); R(ctx, 36, 108, 8, 45, '#4b3b2f'); R(ctx, 118, 108, 8, 45, '#4b3b2f');
+      R(ctx, 46, 72, 30, 18, '#89a69a'); R(ctx, 54, 66, 14, 8, '#dbc6ad'); R(ctx, 58, 58, 5, 8, '#7cb1a9');
+      for (let i = 0; i < 5; i++) { R(ctx, 82 + i * 10, 76, 7, 14, ['#89a69a','#d08878','#d7bd83','#88a0cc','#9dbb88'][i]); R(ctx, 83 + i * 10, 71, 5, 5, '#ede3d1'); }
+      R(ctx, 178, 42, 76, 96, '#4b3c33'); R(ctx, 183, 47, 66, 86, '#866b56'); R(ctx, 192, 57, 24, 24, '#9cb7ab'); R(ctx, 221, 58, 19, 17, '#caa690');
+      break;
+    case 'memories':
+      R(ctx, 34, 30, 122, 88, '#483932'); R(ctx, 40, 36, 110, 76, '#b79771');
+      const scraps = [[52,48,'#f2ebe2'],[80,44,'#dfc6a9'],[104,52,'#f0bfd0'],[127,44,'#d4e2f1'],[56,74,'#ede4d5'],[84,78,'#c2d6bb'],[111,80,'#f7d398']];
+      scraps.forEach(([x,y,c])=>R(ctx,x,y,18,13,c));
+      R(ctx, 176, 116, 68, 18, '#9a7b63'); R(ctx, 182, 102, 56, 14, '#d7c9b5'); R(ctx, 188, 93, 19, 10, '#eec7cf');
+      break;
+    case 'journal':
+      R(ctx, 30, 106, 140, 12, '#4b3b30'); R(ctx, 37, 96, 126, 10, '#856852'); R(ctx, 49, 118, 8, 35, '#4b3b30'); R(ctx, 143, 118, 8, 35, '#4b3b30');
+      R(ctx, 58, 66, 54, 34, '#efe4cf'); R(ctx, 63, 71, 44, 24, '#fbf5ea'); R(ctx, 69, 77, 30, 2, '#aec0d8'); R(ctx, 69, 83, 30, 2, '#aec0d8'); R(ctx, 69, 89, 25, 2, '#aec0d8');
+      R(ctx, 121, 71, 10, 32, '#6f4f61'); R(ctx, 123, 63, 6, 10, '#d7c8a2'); R(ctx, 136, 83, 7, 16, '#d4b28b');
+      break;
+    default:
+      break;
+  }
+
+  R(ctx, 42, 178, 180, 22, '#00000018');
+  drawPet(ctx, pet, 248, 156);
+
+  // plaque label area
+  R(ctx, 12, 12, 88, 16, ROOM_COLORS[roomKey] || '#999');
+  R(ctx, 14, 14, 84, 12, '#00000025');
 }
-function petPreview(canvas,animal){const c=canvas.getContext('2d');c.clearRect(0,0,66,66); c.imageSmoothingEnabled=false;pet(c,animal,9,9,1.3,'manhattan',false);}
-window.PixelWorld={THEMES,PETS,room:pixelRoom,landscape:renderLandscape,themePreview:previewTheme,petPreview};
+
+function drawWindow(canvas, themeKey, time = 'night', weather = true) {
+  const ctx = canvas.getContext('2d'); if (!ctx) return; ctx.clearRect(0,0,canvas.width,canvas.height); scale(ctx, canvas, 320, 300);
+  const t = THEMES[themeKey] || THEMES.manhattan;
+  R(ctx, 0, 0, 320, 300, t.wall2);
+  R(ctx, 20, 20, 280, 260, t.line);
+  R(ctx, 32, 32, 256, 236, t.trim);
+  const off = document.createElement('canvas'); off.width = 248; off.height = 228; const octx = off.getContext('2d'); px(octx); landscape(octx, themeKey, time, weather, 248, 228);
+  ctx.drawImage(off, 36, 36, 248, 228);
+  R(ctx, 156, 36, 6, 228, t.line); R(ctx, 36, 148, 248, 6, t.line);
+  // sill and details
+  R(ctx, 28, 268, 264, 10, t.line); R(ctx, 36, 272, 248, 10, t.floor);
+  if (themeKey === 'manhattan') { R(ctx, 46, 246, 12, 14, '#d7c0ad'); R(ctx, 50, 226, 4, 22, '#6ea28a'); R(ctx, 46, 230, 12, 9, '#7eb095'); }
+  if (themeKey === 'kyoto') { R(ctx, 58, 238, 14, 22, '#cab191'); R(ctx, 54, 222, 21, 14, '#dfa6bc'); }
+  if (themeKey === 'igloo') { drawPet(ctx, 'penguin', 238, 236); }
+  if (themeKey === 'observatory') { R(ctx, 50, 242, 16, 18, '#6b5c7f'); star(ctx, 58, 250, '#fff1b5', 2); }
+}
+
+function themePreview(canvas, themeKey) {
+  const ctx = canvas.getContext('2d'); if (!ctx) return; ctx.clearRect(0,0,canvas.width,canvas.height); scale(ctx, canvas, 160, 100);
+  landscape(ctx, themeKey, THEMES[themeKey]?.time || 'night', true, 160, 100);
+  R(ctx, 6, 68, 148, 22, '#00000055');
+}
+
+function roomPreview(canvas, themeKey, roomKey) {
+  drawRoom(canvas, themeKey, roomKey, 'cat', THEMES[themeKey]?.time || 'night');
+}
+
+window.PixelWorld = { THEMES, PETS, ROOM_COLORS, ROOM_LABELS, drawHub, drawRoom, drawWindow, themePreview, roomPreview };
 })();

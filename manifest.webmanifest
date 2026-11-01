@@ -1,16 +1,16 @@
 {
-  "name": "The Attic — Tu pequeño universo",
+  "name": "The Attic",
   "short_name": "The Attic",
-  "description": "Guarda historias, hobbies y recuerdos en un ático pixelado que crece contigo.",
-  "lang": "es",
+  "description": "Un universo pixel art para guardar películas, libros, juegos, manga, cómics, hobbies, recuerdos y diario.",
   "start_url": "./",
-  "scope": "./",
   "display": "standalone",
+  "background_color": "#1a2030",
+  "theme_color": "#1a2030",
+  "lang": "es",
   "orientation": "portrait",
-  "background_color": "#141c2b",
-  "theme_color": "#141c2b",
   "icons": [
-    {"src":"./assets/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
-    {"src":"./assets/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+    {"src":"./assets/icon-192.png","sizes":"192x192","type":"image/png"},
+    {"src":"./assets/icon-512.png","sizes":"512x512","type":"image/png"},
+    {"src":"./assets/icon-180.png","sizes":"180x180","type":"image/png","purpose":"any maskable"}
   ]
 }
